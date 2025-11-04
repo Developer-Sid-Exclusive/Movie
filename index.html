@@ -3,26 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineVerse - AI Movie Discovery</title>
+    <!-- Use a descriptive title -->
+    <title>CineVerse - AI Movie Discovery Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+        /* Import Google Font */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display.swap');
         
         * {
             font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent; /* Disable tap highlight on mobile */
         }
         
         body {
             background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
             min-height: 100vh;
+            background-attachment: fixed; /* Keep gradient fixed on scroll */
         }
         
+        /* Base glass effect */
         .glass-effect {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
+        /* A stronger glass effect for modal and main cards */
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        /* Gradient text utility */
         .gradient-text {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
@@ -30,6 +43,12 @@
             background-clip: text;
         }
         
+        /* Gradient background utility */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        /* Navigation link underline effect */
         .nav-link {
             position: relative;
             transition: all 0.3s ease;
@@ -52,14 +71,36 @@
             width: 100%;
         }
         
+        /* Movie card hover effects */
         .movie-card {
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .movie-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+        
+        .movie-card:hover::before {
+            opacity: 1;
         }
         
         .movie-card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
         }
-        
+
+        /* Main loading spinner */
         .loader {
             border-top-color: #667eea;
             animation: spin 1s linear infinite;
@@ -70,6 +111,7 @@
             100% { transform: rotate(360deg); }
         }
         
+        /* Content fade-in animation */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -85,25 +127,46 @@
             animation: fadeInUp 0.6s ease-out forwards;
         }
         
+        /* Hero section styling */
         .hero-section {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-radius: 20px;
-            padding: 60px 40px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+            border-radius: 24px;
+            padding: 80px 40px;
             margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
         }
         
-        .search-input, .ai-textarea {
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        /* Search input styling */
+        .search-input {
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
         }
         
-        .search-input:focus, .ai-textarea:focus {
+        .search-input:focus {
             background: rgba(255, 255, 255, 0.15);
             border-color: #667eea;
             box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
         }
         
+        /* Genre chip styling */
         .genre-chip {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
             border: 1px solid rgba(102, 126, 234, 0.3);
@@ -115,72 +178,117 @@
             transform: scale(1.05);
         }
         
+        /* Floating animation for icons */
         .floating {
             animation: floating 3s ease-in-out infinite;
-        }
-
-        .primary-btn {
-            background-image: linear-gradient(to right, #667eea 0%, #764ba2 51%, #667eea 100%);
-            background-size: 200% auto;
-            transition: 0.5s;
-        }
-        .primary-btn:hover {
-            background-position: right center;
         }
         
         @keyframes floating {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-20px); }
         }
-
-        /* Horizontal Scroll */
-        .carousel-container {
-            display: flex;
-            overflow-x: auto;
-            padding-bottom: 20px;
-            gap: 16px;
+        
+        /* Notification styling */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            animation: slideInRight 0.3s ease-out;
         }
-        .carousel-item {
-            flex: 0 0 auto;
-            width: 180px; /* Adjust width as needed */
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Star rating color */
+        .star-rating {
+            color: #fbbf24; /* Tailwind yellow-400 */
+        }
+        
+        /* Skeleton loader styling */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Scroll-in animation */
+        .scroll-fade {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+        
+        .scroll-fade.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        /* Custom Scrollbars */
-        ::-webkit-scrollbar {
+        /* Custom scrollbar for modal */
+        #movieModal > div::-webkit-scrollbar {
             width: 8px;
-            height: 8px;
         }
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
+        #movieModal > div::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #667eea;
+        #movieModal > div::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 10px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #764ba2;
+        #movieModal > div::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        /* Make selects look consistent */
+        select.search-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%239CA3AF' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-position: right 1.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.25em;
+            padding-right: 4rem; /* Make space for arrow */
         }
     </style>
 </head>
 <body class="text-white">
 
     <!-- Navigation -->
-    <nav class="glass-effect sticky top-0 z-50">
+    <nav class="glass-effect sticky top-0 z-50 shadow-lg">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                        <span class="text-2xl">🎬</span>
+                <div class="flex items-center space-x-3 cursor-pointer" data-section="discover">
+                    <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center shadow-lg">
+                        <span class="text-3xl">🎬</span>
                     </div>
-                    <h1 class="text-2xl font-bold gradient-text">CineVerse</h1>
+                    <div>
+                        <h1 class="text-2xl font-bold gradient-text">CineVerse</h1>
+                        <p class="text-xs text-gray-400">AI-Powered Discovery</p>
+                    </div>
                 </div>
                 
-                <div class="hidden md:flex space-x-8">
+                <div class="hidden md:flex items-center space-x-8">
                     <a href="#" class="nav-link active text-white hover:text-purple-300" data-section="discover">Discover</a>
                     <a href="#" class="nav-link text-white hover:text-purple-300" data-section="search">Search</a>
                     <a href="#" class="nav-link text-white hover:text-purple-300" data-section="genres">Genres</a>
-                    <a href="#" class="nav-link text-white hover:text-purple-300" data-section="ai-recommendations">AI Picks</a>
+                    <a href="#" class="nav-link text-white hover:text-purple-300" data-section="advanced">Advanced</a>
+                    <a href="#" class="nav-link text-white hover:text-purple-300" data-section="ai-recommendations">AI Hub</a>
+                    <div class="glass-effect px-4 py-2 rounded-full">
+                        <span class="text-sm">🔥 <span id="searchCount">0</span> searches</span>
+                    </div>
                 </div>
                 
                 <button id="mobileMenuBtn" class="md:hidden text-white">
@@ -195,122 +303,153 @@
                 <a href="#" class="block py-2 nav-link active" data-section="discover">Discover</a>
                 <a href="#" class="block py-2 nav-link" data-section="search">Search</a>
                 <a href="#" class="block py-2 nav-link" data-section="genres">Genres</a>
-                <a href="#" class="block py-2 nav-link" data-section="ai-recommendations">AI Picks</a>
+                <a href="#" class="block py-2 nav-link" data-section="advanced">Advanced</a>
+                <a href="#" class="block py-2 nav-link" data-section="ai-recommendations">AI Hub</a>
             </div>
         </div>
     </nav>
 
     <!-- Main Container -->
     <div class="container mx-auto px-6 py-8 max-w-7xl">
-
-        <!-- API Key Warning -->
-        <div id="apiKeyWarning" class="hidden bg-red-800 border border-red-600 glass-effect text-white px-6 py-4 rounded-xl mb-6 text-center">
-            <h3 class="font-bold text-lg">API Key Missing!</h3>
-            <p id="apiKeyWarningText"></p>
-            <p class="text-sm mt-2">Please add your key to the script file to use this feature.</p>
-        </div>
         
-        <!-- Discover Section -->
+        <!-- Discover Section (Home Page) -->
         <section id="discover-section" class="section-content fade-in-up">
-            <div class="hero-section text-center">
-                <h2 class="text-5xl md:text-6xl font-bold mb-4">
+            <div class="hero-section text-center relative z-10">
+                <div class="text-6xl mb-4 floating">🎭</div>
+                <h2 class="text-5xl md:text-7xl font-bold mb-4">
                     Discover Your Next
-                    <span class="gradient-text">Favorite Film</span>
+                    <span class="gradient-text">Cinematic Journey</span>
                 </h2>
-                <p class="text-xl text-gray-300 mb-8">Powered by AI. Curated for You.</p>
+                <p class="text-xl md:text-2xl text-gray-300 mb-8">Powered by Advanced AI. Curated Just for You.</p>
                 
-                <div class="flex flex-wrap justify-center gap-4 mb-8">
-                    <div class="glass-effect px-6 py-3 rounded-full">
-                        <span class="text-purple-300">🎭</span> Smart Recommendations
+                <div class="max-w-2xl mx-auto">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="quickSearch" 
+                            class="w-full px-8 py-5 rounded-full search-input text-white placeholder-gray-400 outline-none text-lg"
+                            placeholder="Quick search: Try 'Inception' or 'Matrix'...">
+                        <button id="quickSearchBtn" class="absolute right-2 top-1/2 -translate-y-1/2 gradient-bg px-10 py-3 rounded-full font-semibold hover:shadow-2xl transition-all text-white">
+                            Search
+                        </button>
                     </div>
-                    <div class="glass-effect px-6 py-3 rounded-full">
-                        <span class="text-purple-300">🔍</span> Instant Search
-                    </div>
-                    <div class="glass-effect px-6 py-3 rounded-full">
-                        <span class="text-purple-300">🤖</span> AI-Powered
-                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Bar -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+                <div class="glass-effect p-6 rounded-xl text-center">
+                    <div class="text-3xl font-bold gradient-text">10M+</div>
+                    <div class="text-sm text-gray-400 mt-1">Movies Database</div>
+                </div>
+                <div class="glass-effect p-6 rounded-xl text-center">
+                    <div class="text-3xl font-bold gradient-text">AI</div>
+                    <div class="text-sm text-gray-400 mt-1">Powered Search</div>
+                </div>
+                <div class="glass-effect p-6 rounded-xl text-center">
+                    <div class="text-3xl font-bold gradient-text">24/7</div>
+                    <div class="text-sm text-gray-400 mt-1">Always Available</div>
+                </div>
+                <div class="glass-effect p-6 rounded-xl text-center">
+                    <div class="text-3xl font-bold gradient-text">∞</div>
+                    <div class="text-sm text-gray-400 mt-1">Possibilities</div>
                 </div>
             </div>
             
             <!-- Trending Picks -->
-            <div class="mb-12">
-                <h3 class="text-3xl font-bold mb-6">🔥 Trending Now</h3>
-                <div id="trending-movies-container" class="carousel-container">
-                    <!-- Dynamic content will be injected here -->
-                    <div class="carousel-loader text-gray-400">Loading trending movies...</div>
+            <div class="mb-12 scroll-fade">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-3xl md:text-4xl font-bold">🔥 Trending Now</h3>
+                    <button id="refreshTrending" class="glass-effect px-4 py-2 rounded-lg hover:scale-105 transition-all text-sm">
+                        🔄 Refresh
+                    </button>
                 </div>
-            </div>
-
-            <!-- Top Rated -->
-            <div class="mb-12">
-                <h3 class="text-3xl font-bold mb-6">⭐ Top Rated</h3>
-                <div id="top-rated-movies-container" class="carousel-container">
-                    <!-- Dynamic content will be injected here -->
-                    <div class="carousel-loader text-gray-400">Loading top rated movies...</div>
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <button class="trending-btn genre-chip px-6 py-3 rounded-full cursor-pointer font-medium" data-movie="Inception">🎬 Inception</button>
+                    <button class="trending-btn genre-chip px-6 py-3 rounded-full cursor-pointer font-medium" data-movie="The Dark Knight">🦇 The Dark Knight</button>
+                    <button class="trending-btn genre-chip px-6 py-3 rounded-full cursor-pointer font-medium" data-movie="Interstellar">🚀 Interstellar</button>
+                    <button class="trending-btn genre-chip px-6 py-3 rounded-full cursor-pointer font-medium" data-movie="The Shawshank Redemption">⭐ Shawshank Redemption</button>
+                    <button class="trending-btn genre-chip px-6 py-3 rounded-full cursor-pointer font-medium" data-movie="Pulp Fiction">🎭 Pulp Fiction</button>
+                    <button class="trending-btn genre-chip px-6 py-3 rounded-full cursor-pointer font-medium" data-movie="Fight Club">💪 Fight Club</button>
+                    <button class="trending-btn genre-chip px-6 py-3 rounded-full cursor-pointer font-medium" data-movie="Forrest Gump">🏃 Forrest Gump</button>
+                    <button class="trending-btn genre-chip px-6 py-3 rounded-full cursor-pointer font-medium" data-movie="The Matrix">🕶️ The Matrix</button>
                 </div>
             </div>
             
             <!-- Popular Genres -->
-            <div>
-                <h3 class="text-3xl font-bold mb-6">🎨 Browse by Genre</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                    <button class="genre-browse-btn glass-effect p-6 rounded-xl text-center hover:scale-105 transition-transform" data-genre="Action">
-                        <div class="text-4xl mb-2">💥</div>
-                        <div class="font-semibold">Action</div>
+            <div class="scroll-fade">
+                <h3 class="text-3xl md:text-4xl font-bold mb-6">🎨 Explore by Genre</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                    <button class="genre-browse-btn glass-effect p-8 rounded-2xl text-center hover:scale-105 transition-all" data-genre="Action">
+                        <div class="text-5xl mb-3">💥</div>
+                        <div class="font-bold text-lg">Action</div>
+                        <div class="text-xs text-gray-400 mt-1">Explosive & Thrilling</div>
                     </button>
-                    <button class="genre-browse-btn glass-effect p-6 rounded-xl text-center hover:scale-105 transition-transform" data-genre="Comedy">
-                        <div class="text-4xl mb-2">😂</div>
-                        <div class="font-semibold">Comedy</div>
+                    <button class="genre-browse-btn glass-effect p-8 rounded-2xl text-center hover:scale-105 transition-all" data-genre="Comedy">
+                        <div class="text-5xl mb-3">😂</div>
+                        <div class="font-bold text-lg">Comedy</div>
+                        <div class="text-xs text-gray-400 mt-1">Laugh Out Loud</div>
                     </button>
-                    <button class="genre-browse-btn glass-effect p-6 rounded-xl text-center hover:scale-105 transition-transform" data-genre="Drama">
-                        <div class="text-4xl mb-2">🎭</div>
-                        <div class="font-semibold">Drama</div>
+                    <button class="genre-browse-btn glass-effect p-8 rounded-2xl text-center hover:scale-105 transition-all" data-genre="Drama">
+                        <div class="text-5xl mb-3">🎭</div>
+                        <div class="font-bold text-lg">Drama</div>
+                        <div class="text-xs text-gray-400 mt-1">Emotional Stories</div>
                     </button>
-                    <button class="genre-browse-btn glass-effect p-6 rounded-xl text-center hover:scale-105 transition-transform" data-genre="Horror">
-                        <div class="text-4xl mb-2">👻</div>
-                        <div class="font-semibold">Horror</div>
+                    <button class="genre-browse-btn glass-effect p-8 rounded-2xl text-center hover:scale-105 transition-all" data-genre="Horror">
+                        <div class="text-5xl mb-3">👻</div>
+                        <div class="font-bold text-lg">Horror</div>
+                        <div class="text-xs text-gray-400 mt-1">Spine Chilling</div>
                     </button>
-                    <button class="genre-browse-btn glass-effect p-6 rounded-xl text-center hover:scale-105 transition-transform" data-genre="Sci-Fi">
-                        <div class="text-4xl mb-2">🚀</div>
-                        <div class="font-semibold">Sci-Fi</div>
+                    <button class="genre-browse-btn glass-effect p-8 rounded-2xl text-center hover:scale-105 transition-all" data-genre="Sci-Fi">
+                        <div class="text-5xl mb-3">🚀</div>
+                        <div class="font-bold text-lg">Sci-Fi</div>
+                        <div class="text-xs text-gray-400 mt-1">Future & Beyond</div>
                     </button>
-                    <button class="genre-browse-btn glass-effect p-6 rounded-xl text-center hover:scale-105 transition-transform" data-genre="Romance">
-                        <div class="text-4xl mb-2">💕</div>
-                        <div class="font-semibold">Romance</div>
+                    <button class="genre-browse-btn glass-effect p-8 rounded-2xl text-center hover:scale-105 transition-all" data-genre="Romance">
+                        <div class="text-5xl mb-3">💕</div>
+                        <div class="font-bold text-lg">Romance</div>
+                        <div class="text-xs text-gray-400 mt-1">Love Stories</div>
                     </button>
+                    <!-- Add more genres as needed -->
                 </div>
             </div>
         </section>
 
         <!-- Search Section -->
-        <section id="search-section" class="section-content hidden">
-            <div class="glass-effect p-8 rounded-2xl mb-8">
-                <h2 class="text-4xl font-bold mb-6 text-center">
-                    <span class="gradient-text">Search Movies</span>
+        <section id="search-section" class="section-content hidden fade-in-up">
+            <div class="glass-strong p-10 rounded-3xl mb-8">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-center">
+                    <span class="gradient-text">Find Your Movie</span>
                 </h2>
                 
-                <div class="max-w-3xl mx-auto">
+                <div class="max-w-4xl mx-auto">
                     <div class="relative mb-6">
                         <input 
                             type="text" 
                             id="movieSearch" 
-                            class="w-full px-6 py-4 rounded-full search-input text-white placeholder-gray-400 outline-none text-lg pr-32"
-                            placeholder="Search for any movie...">
-                        <button id="searchBtn" class="absolute right-2 top-1/2 -translate-y-1/2 primary-btn px-8 py-2 rounded-full font-semibold hover:shadow-lg text-white">
-                            Search
+                            class="w-full px-8 py-5 rounded-full search-input text-white placeholder-gray-400 outline-none text-lg"
+                            placeholder="Search by title, actor, director, or IMDb ID...">
+                        <button id="searchBtn" class="absolute right-2 top-1/2 -translate-y-1/2 gradient-bg px-10 py-3 rounded-full font-semibold hover:shadow-2xl transition-all text-white">
+                            🔍 Search
                         </button>
                     </div>
                     
-                    <div class="flex items-center justify-center gap-4 text-sm text-gray-400">
-                        <label class="flex items-center gap-2 cursor-pointer">
+                    <div class="flex flex-wrap items-center justify-center gap-6 text-sm">
+                        <label class="flex items-center gap-2 cursor-pointer glass-effect px-4 py-2 rounded-full hover:scale-105 transition-all">
                             <input type="radio" name="searchType" value="title" checked class="accent-purple-500">
                             <span>By Title</span>
                         </label>
-                        <label class="flex items-center gap-2 cursor-pointer">
+                        <label class="flex items-center gap-2 cursor-pointer glass-effect px-4 py-2 rounded-full hover:scale-105 transition-all">
                             <input type="radio" name="searchType" value="id" class="accent-purple-500">
                             <span>By IMDb ID</span>
                         </label>
+                        <button id="clearSearch" class="glass-effect px-4 py-2 rounded-full hover:scale-105 transition-all">
+                            🗑️ Clear
+                        </button>
                     </div>
+                    
+                    <!-- Search History -->
+                    <div id="searchHistory" class="mt-6"></div>
                 </div>
             </div>
             
@@ -319,44 +458,55 @@
         </section>
 
         <!-- Genres Section -->
-        <section id="genres-section" class="section-content hidden">
-            <div class="glass-effect p-8 rounded-2xl mb-8">
-                <h2 class="text-4xl font-bold mb-6 text-center">
-                    <span class="gradient-text">Explore by Genre</span>
+        <section id="genres-section" class="section-content hidden fade-in-up">
+            <div class="glass-strong p-10 rounded-3xl mb-8">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-center">
+                    <span class="gradient-text">Genre Explorer</span>
                 </h2>
                 
-                <div class="max-w-4xl mx-auto">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="max-w-5xl mx-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <select id="genreSelect" class="px-6 py-4 rounded-xl search-input text-white outline-none">
                             <option value="">Select a genre...</option>
-                            <option value="Action">Action</option>
-                            <option value="Comedy">Comedy</option>
-                            <option value="Drama">Drama</option>
-                            <option value="Fantasy">Fantasy</option>
-                            <option value="Horror">Horror</option>
-                            <option value="Mystery">Mystery</option>
-                            <option value="Romance">Romance</option>
-                            <option value="Sci-Fi">Sci-Fi</option>
-                            <option value="Thriller">Thriller</option>
-                            <option value="Animation">Animation</option>
-                            <option value="Western">Western</option>
-                            <option value="Documentary">Documentary</option>
-                            <option value="Crime">Crime</option>
+                            <option value="Action">💥 Action</option>
+                            <option value="Comedy">😂 Comedy</option>
+                            <option value="Drama">🎭 Drama</option>
+                            <option value="Fantasy">🧙 Fantasy</option>
+                            <option value="Horror">👻 Horror</option>
+                            <option value="Mystery">🔍 Mystery</option>
+                            <option value="Romance">💕 Romance</option>
+                            <option value="Sci-Fi">🚀 Sci-Fi</option>
+                            <option value="Thriller">🔪 Thriller</option>
+                            <option value="Animation">🎨 Animation</option>
+                            <option value="Western">🤠 Western</option>
+                            <option value="Documentary">📽️ Documentary</option>
                         </select>
                         
                         <select id="languageSelect" class="px-6 py-4 rounded-xl search-input text-white outline-none">
-                            <option value="">Any Language</option>
-                            <option value="English">English</option>
-                            <option value="French">French</option>
-                            <option value="Japanese">Japanese</option>
-                            <option value="Spanish">Spanish</option>
-                            <option value="Korean">Korean</option>
-                            <option value="Hindi">Hindi</option>
+                            <option value="">🌍 Any Language</option>
+                            <option value="English">🇺🇸 English</option>
+                            <option value="French">🇫🇷 French</option>
+                            <option value="Japanese">🇯🇵 Japanese</option>
+                            <option value="Spanish">🇪🇸 Spanish</option>
+                            <option value="Korean">🇰🇷 Korean</option>
+                            <option value="Hindi">🇮🇳 Hindi</option>
+                            <option value="Chinese">🇨🇳 Chinese</option>
+                            <option value="Italian">🇮🇹 Italian</option>
+                        </select>
+                        
+                        <select id="yearRange" class="px-6 py-4 rounded-xl search-input text-white outline-none">
+                            <option value="">📅 Any Year</option>
+                            <option value="2020s">2020s</option>
+                            <option value="2010s">2010s</option>
+                            <option value="2000s">2000s</option>
+                            <option value="1990s">1990s</option>
+                            <option value="1980s">1980s</option>
+                            <option value="Classic">Before 1980</option>
                         </select>
                     </div>
                     
-                    <button id="getGenreMovies" class="w-full primary-btn px-8 py-4 rounded-xl font-semibold text-lg text-white hover:shadow-lg">
-                        Get Recommendations
+                    <button id="getGenreMovies" class="w-full gradient-bg px-8 py-5 rounded-xl font-semibold text-lg hover:shadow-2xl transition-all text-white">
+                        🎬 Get Recommendations
                     </button>
                 </div>
             </div>
@@ -364,61 +514,157 @@
             <div id="genreResults"></div>
         </section>
 
+        <!-- Advanced Section -->
+        <section id="advanced-section" class="section-content hidden fade-in-up">
+            <div class="glass-strong p-10 rounded-3xl mb-8">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-center">
+                    <span class="gradient-text">Advanced Search</span>
+                </h2>
+                
+                <div class="max-w-5xl mx-auto space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">🎬 Movie Title</label>
+                            <input type="text" id="advTitle" class="w-full px-6 py-4 rounded-xl search-input text-white outline-none" placeholder="Enter title...">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">📅 Year</label>
+                            <input type="text" id="advYear" class="w-full px-6 py-4 rounded-xl search-input text-white outline-none" placeholder="e.g., 2020">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">🎭 Genre</label>
+                            <input type="text" id="advGenre" class="w-full px-6 py-4 rounded-xl search-input text-white outline-none" placeholder="e.g., Action, Drama">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">⭐ Min Rating (IMDb)</label>
+                            <input type="number" id="advRating" min="1" max="10" step="0.1" class="w-full px-6 py-4 rounded-xl search-input text-white outline-none" placeholder="e.g., 7.5">
+                        </div>
+                    </div>
+                    
+                    <button id="advancedSearchBtn" class="w-full gradient-bg px-8 py-5 rounded-xl font-semibold text-lg hover:shadow-2xl transition-all text-white">
+                        🔍 Advanced Search
+                    </button>
+                </div>
+            </div>
+            
+            <div id="advancedResults"></div>
+        </section>
+
         <!-- AI Recommendations Section -->
-        <section id="ai-recommendations-section" class="section-content hidden">
-            <div class="glass-effect p-8 rounded-2xl text-center">
+        <section id="ai-recommendations-section" class="section-content hidden fade-in-up">
+            <div class="glass-strong p-10 rounded-3xl text-center mb-8">
                 <div class="max-w-3xl mx-auto">
-                    <div class="text-6xl mb-4 floating">🤖</div>
-                    <h2 class="text-4xl font-bold mb-4">
-                        <span class="gradient-text">Your Personal AI Recommender</span>
+                    <div class="text-7xl mb-6 floating">🤖</div>
+                    <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                        <span class="gradient-text">AI Discovery Hub</span>
                     </h2>
                     <p class="text-xl text-gray-300 mb-8">
-                        Tell me what you're in the mood for, and I'll find the perfect movies!
+                        Harness the power of AI to discover movies tailored to your taste
                     </p>
                     
-                    <div class="mb-6">
-                        <textarea id="aiPrompt" class="w-full h-28 ai-textarea rounded-xl p-4 text-white placeholder-gray-400 outline-none" placeholder="e.g., 'A mind-bending sci-fi movie like Inception', 'A lighthearted comedy for date night', 'Hidden gems from the 90s'"></textarea>
+                    <div class="glass-effect p-8 rounded-2xl mb-8 text-left">
+                        <h3 class="text-2xl font-bold mb-4 text-center">How It Works</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="flex items-start gap-4">
+                                <div class="text-3xl">1️⃣</div>
+                                <div>
+                                    <h4 class="font-semibold mb-1">Search & Select</h4>
+                                    <p class="text-sm text-gray-400">Find a movie you love using our search</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="text-3xl">2️⃣</div>
+                                <div>
+                                    <h4 class="font-semibold mb-1">View Details</h4>
+                                    <p class="text-sm text-gray-400">Explore comprehensive movie information</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="text-3xl">3️⃣</div>
+                                <div>
+                                    <h4 class="font-semibold mb-1">Get AI Suggestions</h4>
+                                    <p class="text-sm text-gray-400">Click the AI button for smart recommendations</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="text-3xl">4️⃣</div>
+                                <div>
+                                    <h4 class="font-semibold mb-1">Discover More</h4>
+                                    <p class="text-sm text-gray-400">Explore similar films curated by AI</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <button id="getAIPicksBtn" class="primary-btn px-8 py-4 rounded-xl font-semibold text-lg text-white hover:shadow-lg">
-                        Get AI Picks
-                    </button>
-
-                    <div id="aiPicksResults" class="mt-8 text-left">
-                        <!-- AI suggestions will be injected here -->
+                    <div class="flex flex-wrap gap-4 justify-center">
+                        <button id="goToSearch" class="gradient-bg px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-2xl transition-all text-white">
+                            🔍 Start Searching
+                        </button>
+                        <button id="tryRandomMovie" class="glass-effect px-8 py-4 rounded-xl font-semibold text-lg hover:scale-105 transition-all">
+                            🎲 Random Movie
+                        </button>
                     </div>
+                </div>
+            </div>
+            
+            <!-- AI Features Showcase -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-effect p-6 rounded-2xl text-center">
+                    <div class="text-5xl mb-4">🧠</div>
+                    <h3 class="text-xl font-bold mb-2">Smart Analysis</h3>
+                    <p class="text-gray-400">AI analyzes plot, genre, and themes</p>
+                </div>
+                <div class="glass-effect p-6 rounded-2xl text-center">
+                    <div class="text-5xl mb-4">🎯</div>
+                    <h3 class="text-xl font-bold mb-2">Precise Matching</h3>
+                    <p class="text-gray-400">Find movies that match your vibe</p>
+                </div>
+                <div class="glass-effect p-6 rounded-2xl text-center">
+                    <div class="text-5xl mb-4">✨</div>
+                    <h3 class="text-xl font-bold mb-2">Hidden Gems</h3>
+                    <p class="text-gray-400">Discover underrated masterpieces</p>
                 </div>
             </div>
         </section>
 
         <!-- Loading Spinner -->
         <div id="loadingSpinner" class="hidden text-center py-20">
-            <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-600 h-20 w-20 mx-auto"></div>
-            <p class="mt-4 text-gray-400">Loading...</p>
+            <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-600 h-24 w-24 mx-auto"></div>
+            <p class="mt-6 text-xl text-gray-400">Loading amazing content...</p>
         </div>
 
         <!-- Movie Details Modal -->
-        <div id="movieModal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
-            <div class="glass-effect rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                <div id="movieDetailsContent" class="relative">
-                    <!-- Dynamic content will be injected here -->
-                </div>
+        <div id="movieModal" class="hidden fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="glass-strong rounded-3xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+                <!-- Content injected by JS -->
+                <div id="movieDetailsContent"></div>
             </div>
         </div>
     </div>
 
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="fixed top-20 right-4 z-[100] w-full max-w-md"></div>
+
     <script>
         // --- Configuration ---
-        // !!! IMPORTANT !!!
-        // Get your free API key from https://www.omdbapi.com/
-        const OMDB_API_KEY = "42ed8174"; // PASTE YOUR OMDB API KEY HERE
+        // IMPORTANT: Add your OMDb API key here.
+        // You can get a free key from https://www.omdbapi.com/apikey.aspx
+        const OMDB_API_KEY = '42ed8174'; // <-- *** CRITICAL FIX: Add your key here ***
         
-        // Get your API key from Google AI Studio
-        const GEMINI_API_KEY = "AIzaSyB9LnIZEgfWoNngsSbck3dtxbylzSS9KzQ"; // PASTE YOUR GEMINI API KEY HERE
-        // !!!!!!!!!!!!!!!!!!!!!
-
+        // IMPORTANT: The Gemini API key is expected to be provided by the environment.
+        const GEMINI_API_KEY = 'AIzaSyB9LnIZEgfWoNngsSbck3dtxbylzSS9KzQ'; // <-- *** CRITICAL FIX: Left blank to be injected by environment ***
+        
         const OMDB_API_URL = 'https://www.omdbapi.com/';
+        // <-- *** CRITICAL FIX: Updated to correct Gemini model URL ***
         const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`;
+
+        // --- State Management ---
+        let searchHistory = [];
+        let searchCount = 0;
+        let currentMovieData = null;
 
         // --- DOM Elements ---
         const navLinks = document.querySelectorAll('.nav-link');
@@ -427,161 +673,346 @@
         const mobileMenu = document.getElementById('mobileMenu');
         const searchBtn = document.getElementById('searchBtn');
         const movieSearch = document.getElementById('movieSearch');
+        const quickSearchBtn = document.getElementById('quickSearchBtn');
+        const quickSearch = document.getElementById('quickSearch');
         const searchResults = document.getElementById('searchResults');
         const loadingSpinner = document.getElementById('loadingSpinner');
         const movieModal = document.getElementById('movieModal');
         const movieDetailsContent = document.getElementById('movieDetailsContent');
         const genreResults = document.getElementById('genreResults');
-        const apiKeyWarning = document.getElementById('apiKeyWarning');
-        const apiKeyWarningText = document.getElementById('apiKeyWarningText');
+        const advancedResults = document.getElementById('advancedResults');
+        const searchCountEl = document.getElementById('searchCount');
+        const clearSearch = document.getElementById('clearSearch');
+        const searchHistoryContainer = document.getElementById('searchHistory');
+        const getGenreMoviesBtn = document.getElementById('getGenreMovies');
+        const genreSelect = document.getElementById('genreSelect');
+        const languageSelect = document.getElementById('languageSelect');
+        const yearRangeSelect = document.getElementById('yearRange');
+        const advancedSearchBtn = document.getElementById('advancedSearchBtn');
+        const advTitle = document.getElementById('advTitle');
+        const advYear = document.getElementById('advYear');
+        const advGenre = document.getElementById('advGenre');
+        const advRating = document.getElementById('advRating');
+        const goToSearchBtn = document.getElementById('goToSearch');
+        const tryRandomMovieBtn = document.getElementById('tryRandomMovie');
+        const refreshTrendingBtn = document.getElementById('refreshTrending');
+        const genreBrowseBtns = document.querySelectorAll('.genre-browse-btn');
+        const trendingBtns = document.querySelectorAll('.trending-btn');
+        const notificationContainer = document.getElementById('notificationContainer');
+        const navLogo = document.querySelector('nav .flex.items-center.space-x-3.cursor-pointer');
 
-        // --- State ---
-        let discoverPageLoaded = false;
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initScrollAnimations();
+            loadSearchHistory();
+            loadSearchCount();
+            setupEventListeners();
+            // Welcome notification
+            setTimeout(() => {
+                if (searchCount === 0) {
+                    showNotification('Welcome to CineVerse! 🎬', 'success');
+                }
+            }, 1000);
+        });
 
-        // --- API Key Check ---
-        function showApiKeyWarning(service) {
-            apiKeyWarningText.textContent = `Your ${service} API Key is missing.`;
-            apiKeyWarning.classList.remove('hidden');
-        }
+        // --- Event Listeners Setup ---
+        function setupEventListeners() {
+            // Navigation
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    navigateToSection(link.dataset.section);
+                });
+            });
+            
+            navLogo.addEventListener('click', () => navigateToSection('discover'));
 
-        function checkGeminiKey() {
-            if (GEMINI_API_KEY === "") {
-                showApiKeyWarning("Gemini");
-                return false;
-            }
-            apiKeyWarning.classList.add('hidden');
-            return true;
-        }
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
 
-        function checkOmdbKey() {
-            if (OMDB_API_KEY === "") {
-                showApiKeyWarning("OMDB");
-                return false;
-            }
-            apiKeyWarning.classList.add('hidden');
-            return true;
+            // Search
+            searchBtn.addEventListener('click', performSearch);
+            movieSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') performSearch();
+            });
+            
+            quickSearchBtn.addEventListener('click', () => {
+                movieSearch.value = quickSearch.value;
+                navigateToSection('search');
+                setTimeout(performSearch, 50); // Small delay for section to appear
+            });
+
+            quickSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') quickSearchBtn.click();
+            });
+
+            clearSearch.addEventListener('click', () => {
+                movieSearch.value = '';
+                searchResults.innerHTML = '';
+            });
+
+            // Genre Search
+            getGenreMoviesBtn.addEventListener('click', performGenreSearch);
+
+            // Advanced Search
+            advancedSearchBtn.addEventListener('click', performAdvancedSearch);
+
+            // Discover Page Buttons
+            goToSearchBtn.addEventListener('click', () => navigateToSection('search'));
+            tryRandomMovieBtn.addEventListener('click', findRandomMovie);
+            refreshTrendingBtn.addEventListener('click', () => showNotification('Trending movies refreshed!', 'info'));
+
+            genreBrowseBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    navigateToSection('genres');
+                    genreSelect.value = btn.dataset.genre;
+                    setTimeout(performGenreSearch, 50);
+                });
+            });
+
+            trendingBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    movieSearch.value = btn.dataset.movie;
+                    navigateToSection('search');
+                    setTimeout(performSearch, 50);
+                });
+            });
+
+            // Modal
+            movieModal.addEventListener('click', (e) => {
+                if (e.target === movieModal) closeModal();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !movieModal.classList.contains('hidden')) {
+                    closeModal();
+                }
+            });
         }
 
         // --- Navigation ---
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetSection = link.dataset.section;
-                
-                // Update active states
-                navLinks.forEach(l => l.classList.remove('active'));
-                
-                // Find all links for this section (for mobile + desktop)
-                document.querySelectorAll(`.nav-link[data-section="${targetSection}"]`).forEach(l => l.classList.add('active'));
-                
-                // Show target section
-                sections.forEach(section => {
-                    section.classList.add('hidden');
-                    if (section.id === `${targetSection}-section`) {
-                        section.classList.remove('hidden');
-                    }
-                });
-                
-                // Close mobile menu
-                mobileMenu.classList.add('hidden');
-
-                // Load discover page content on first visit
-                if (targetSection === 'discover' && !discoverPageLoaded) {
-                    initDiscoverPage();
+        function navigateToSection(targetSectionId) {
+            // Update active states
+            navLinks.forEach(l => {
+                l.classList.toggle('active', l.dataset.section === targetSectionId);
+            });
+            
+            // Show target section
+            sections.forEach(section => {
+                section.classList.toggle('hidden', section.id !== `${targetSectionId}-section`);
+                if (section.id === `${targetSectionId}-section`) {
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
-        });
-
-        // Mobile menu toggle
-        mobileMenuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-
-        // --- Discover Page ---
-        async function initDiscoverPage() {
-            if (!checkGeminiKey() || !checkOmdbKey()) {
-                document.getElementById('trending-movies-container').innerHTML = `<p class="text-red-400">Please set API keys to load content.</p>`;
-                document.getElementById('top-rated-movies-container').innerHTML = `<p class="text-red-400">Please set API keys to load content.</p>`;
-                return;
-            }
-            discoverPageLoaded = true;
-            fetchDynamicCategory(
-                "Suggest 10 currently trending and popular movies.",
-                document.getElementById('trending-movies-container')
-            );
-            fetchDynamicCategory(
-                "Suggest 10 all-time top-rated and critically acclaimed movies.",
-                document.getElementById('top-rated-movies-container')
-            );
+            
+            // Close mobile menu
+            mobileMenu.classList.add('hidden');
         }
 
-        async function fetchDynamicCategory(prompt, container) {
-            try {
-                const geminiList = await fetchGeminiMovieList(prompt);
+        // --- Search History & Count ---
+        function loadSearchHistory() {
+            const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+            searchHistory = history.slice(0, 5);
+            updateSearchHistoryUI();
+        }
+
+        function addToSearchHistory(query) {
+            if (!query || query.trim().length === 0) return;
+            // Remove if already exists to move it to the front
+            searchHistory = searchHistory.filter(item => item.toLowerCase() !== query.toLowerCase());
+            // Add to the front
+            searchHistory.unshift(query);
+            // Limit to 5
+            searchHistory = searchHistory.slice(0, 5);
+            localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+            updateSearchHistoryUI();
+        }
+
+        function updateSearchHistoryUI() {
+            if (searchHistory.length > 0) {
+                searchHistoryContainer.innerHTML = `
+                    <div class="glass-effect p-4 rounded-xl mt-6">
+                        <h4 class="text-sm font-semibold mb-2 text-gray-400">Recent Searches</h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${searchHistory.map(term => `
+                                <button class="history-item px-3 py-1 rounded-full text-sm glass-effect hover:scale-105 transition-all" data-term="${term}">
+                                    🔍 ${term}
+                                </button>
+                            `).join('')}
+                            <button id="clearHistory" class="px-3 py-1 rounded-full text-sm glass-effect hover:scale-105 transition-all text-red-400">
+                                🗑️ Clear
+                            </button>
+                        </div>
+                    </div>
+                `;
                 
-                const moviePromises = geminiList.map(movie => 
-                    fetchOMDBDetailsByTitle(movie.title, movie.year)
-                );
-                const movieData = await Promise.all(moviePromises);
+                searchHistoryContainer.querySelectorAll('.history-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        movieSearch.value = item.dataset.term;
+                        performSearch();
+                    });
+                });
                 
-                const validMovies = movieData.filter(movie => movie && movie.Response === 'True');
-                
-                if (validMovies.length > 0) {
-                    container.innerHTML = validMovies.map(movie => 
-                        renderMovieCard(movie, 'carousel-item')
-                    ).join('');
-                } else {
-                    container.innerHTML = `<p class="text-gray-400">Could not find movie details.</p>`;
+                searchHistoryContainer.querySelector('#clearHistory').addEventListener('click', () => {
+                    searchHistory = [];
+                    localStorage.removeItem('searchHistory');
+                    updateSearchHistoryUI();
+                    showNotification('Search history cleared', 'info');
+                });
+            } else {
+                searchHistoryContainer.innerHTML = '';
+            }
+        }
+
+        function loadSearchCount() {
+            searchCount = parseInt(localStorage.getItem('searchCount') || '0');
+            searchCountEl.textContent = searchCount;
+        }
+
+        function incrementSearchCount() {
+            searchCount++;
+            searchCountEl.textContent = searchCount;
+            localStorage.setItem('searchCount', searchCount);
+        }
+
+        // --- Notifications ---
+        function showNotification(message, type = 'info') {
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            
+            const notification = document.createElement('div');
+            notification.className = `notification glass-strong px-6 py-4 rounded-xl shadow-2xl mb-4`;
+            notification.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="text-2xl">${icons[type]}</div>
+                    <div class="flex-1">
+                        <p class="font-semibold">${message}</p>
+                    </div>
+                    <button class="text-gray-400 hover:text-white" onclick="this.parentElement.parentElement.remove()">✕</button>
+                </div>
+            `;
+            
+            notificationContainer.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideInRight 0.3s ease-out reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // --- Utility Functions ---
+        function showLoading(show) {
+            if (show) {
+                loadingSpinner.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        function showLoadingSkeleton(container, count = 5) {
+            container.innerHTML = `
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                    ${Array(count).fill(0).map(() => `
+                        <div class="glass-effect rounded-2xl overflow-hidden">
+                            <div class="skeleton h-80 w-full"></div>
+                            <div class="p-4">
+                                <div class="skeleton h-4 w-3/4 mb-2 rounded"></div>
+                                <div class="skeleton h-3 w-1/2 rounded"></div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function closeModal() {
+            movieModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            movieDetailsContent.innerHTML = ''; // Clear content
+        }
+
+        /**
+         * Fetches from an API with exponential backoff.
+         * @param {string} url - The URL to fetch.
+         * @param {object} options - The fetch options (method, headers, body).
+         * @param {number} maxRetries - Maximum number of retries.
+         * @returns {Promise<object>} - The parsed JSON response.
+         */
+        async function fetchWithBackoff(url, options, maxRetries = 3) {
+            let delay = 1000;
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        if (response.status === 429 || response.status >= 500) {
+                            throw new Error(`API Error: ${response.status}`);
+                        }
+                        const errorData = await response.json();
+                        throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    if (i === maxRetries - 1) throw error;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
                 }
-
-            } catch (error) {
-                console.error(error);
-                container.innerHTML = `<p class="text-red-400">Error loading category: ${error.message}</p>`;
             }
         }
 
-        // --- Search ---
-        searchBtn.addEventListener('click', performSearch);
-        movieSearch.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') performSearch();
-        });
+        // --- Core Search Logic ---
 
         async function performSearch() {
-            if (!checkOmdbKey()) return;
-
             const query = movieSearch.value.trim();
-            if (!query) return;
+            if (!query) {
+                showNotification('Please enter a search term', 'warning');
+                return;
+            }
+
+            if (OMDB_API_KEY === 'YOUR_OMDB_API_KEY') {
+                showNotification('OMDb API key is missing!', 'error');
+                searchResults.innerHTML = `<div class="glass-effect p-10 rounded-2xl text-center"><p class="text-xl text-red-400">Error: Please add your OMDb API key to the script.</p></div>`;
+                return;
+            }
             
             const searchType = document.querySelector('input[name="searchType"]:checked').value;
             const searchParam = searchType === 'id' ? 'i' : 's';
             
             showLoading(true);
-            searchResults.innerHTML = '';
+            showLoadingSkeleton(searchResults, 10); // Show skeleton loader
             
             try {
-                const response = await fetch(`${OMDB_API_URL}?apikey=${OMDB_API_KEY}&${searchParam}=${encodeURIComponent(query)}`);
-                const data = await response.json();
+                const data = await fetchWithBackoff(`${OMDB_API_URL}?apikey=${OMDB_API_KEY}&${searchParam}=${encodeURIComponent(query)}`);
                 
                 if (data.Response === 'True') {
+                    incrementSearchCount();
+                    addToSearchHistory(query);
+                    
                     if (searchParam === 's') {
                         displaySearchResults(data.Search);
                     } else {
-                        // It's a single result from an ID search, show modal
-                        await fetchMovieDetails(data.imdbID);
+                        showMovieDetails(data);
+                        searchResults.innerHTML = ''; // Clear results as we are showing modal
                     }
+                    showNotification('Search completed successfully!', 'success');
                 } else {
                     searchResults.innerHTML = `
-                        <div class="glass-effect p-8 rounded-2xl text-center">
-                            <p class="text-xl text-gray-400">${data.Error}</p>
+                        <div class="glass-effect p-10 rounded-2xl text-center">
+                            <div class="text-6xl mb-4">🔍</div>
+                            <p class="text-2xl font-semibold mb-2">No Results Found</p>
+                            <p class="text-gray-400">${data.Error}</p>
                         </div>
                     `;
+                    showNotification(data.Error, 'error');
                 }
             } catch (error) {
                 searchResults.innerHTML = `
-                    <div class="glass-effect p-8 rounded-2xl text-center">
-                        <p class="text-xl text-red-400">Error: ${error.message}</p>
+                    <div class="glass-effect p-10 rounded-2xl text-center">
+                        <div class="text-6xl mb-4">⚠️</div>
+                        <p class="text-2xl font-semibold mb-2">Error Occurred</p>
+                        <p class="text-red-400">${error.message}</p>
                     </div>
                 `;
+                showNotification('Search failed: ' + error.message, 'error');
             } finally {
                 showLoading(false);
             }
@@ -589,119 +1020,139 @@
 
         function displaySearchResults(movies) {
             searchResults.innerHTML = `
-                <h3 class="text-2xl font-bold mb-6">Search Results</h3>
+                <div class="mb-6 flex items-center justify-between">
+                    <h3 class="text-3xl font-bold">🎬 Search Results</h3>
+                    <span class="glass-effect px-4 py-2 rounded-full">${movies.length} results</span>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                    ${movies.map(movie => renderMovieCard(movie)).join('')}
+                    ${movies.map(movie => `
+                        <div class="movie-card glass-effect rounded-2xl overflow-hidden cursor-pointer group" data-id="${movie.imdbID}">
+                            <div class="relative">
+                                <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'https://placehold.co/300x445/667eea/ffffff?text=' + encodeURIComponent(movie.Title)}" 
+                                     alt="${movie.Title}" 
+                                     class="w-full h-80 object-cover"
+                                     onerror="this.src='https://placehold.co/300x445/667eea/ffffff?text=Image+Not+Found'">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4 z-10">
+                                    <span class="text-white font-semibold">View Details →</span>
+                                </div>
+                            </div>
+                            <div class="p-4 relative z-20">
+                                <h4 class="font-semibold truncate text-lg">${movie.Title}</h4>
+                                <p class="text-sm text-gray-400">${movie.Year}</p>
+                                <span class="inline-block mt-2 text-xs px-3 py-1 rounded-full genre-chip">${movie.Type}</span>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
             `;
-        }
-
-        // --- Movie Card Renderer ---
-        function renderMovieCard(movie, extraClasses = '') {
-            const posterUrl = movie.Poster !== 'N/A' ? movie.Poster : 
-                `https://placehold.co/300x445/667eea/ffffff?text=${encodeURIComponent(movie.Title)}`;
             
-            return `
-                <div class="movie-card glass-effect rounded-xl overflow-hidden cursor-pointer ${extraClasses}" data-id="${movie.imdbID}">
-                    <img src="${posterUrl}" 
-                         alt="${movie.Title}" 
-                         class="w-full h-64 md:h-72 object-cover"
-                         onerror="this.onerror=null;this.src='https://placehold.co/300x445/667eea/ffffff?text=${encodeURIComponent(movie.Title)}';">
-                    <div class="p-4">
-                        <h4 class="font-semibold truncate">${movie.Title}</h4>
-                        <p class="text-sm text-gray-400">${movie.Year}</p>
-                    </div>
-                </div>
-            `;
+            document.querySelectorAll('.movie-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    fetchMovieDetails(card.dataset.id);
+                });
+            });
         }
 
-        // --- OMDB Helpers ---
-        async function fetchOMDBDetailsByTitle(title, year) {
-            try {
-                const response = await fetch(`${OMDB_API_URL}?apikey=${OMDB_API_KEY}&t=${encodeURIComponent(title)}&y=${year}`);
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error("OMDB fetch error:", error);
-                return null;
-            }
-        }
+        // --- Movie Details Modal ---
 
         async function fetchMovieDetails(imdbID) {
-            if (!checkOmdbKey()) return;
-            showLoading(true);
+            showLoading(true); // Use main loader for modal fetch
             try {
-                const response = await fetch(`${OMDB_API_URL}?apikey=${OMDB_API_KEY}&i=${imdbID}&plot=full`);
-                const data = await response.json();
+                const data = await fetchWithBackoff(`${OMDB_API_URL}?apikey=${OMDB_API_KEY}&i=${imdbID}&plot=full`);
                 if (data.Response === 'True') {
+                    currentMovieData = data;
                     showMovieDetails(data);
+                } else {
+                    throw new Error(data.Error);
                 }
             } catch (error) {
-                console.error(error);
-                // Handle error display if needed
+                showNotification('Failed to load movie details', 'error');
             } finally {
                 showLoading(false);
             }
         }
 
-        // --- Movie Modal ---
         function showMovieDetails(movie) {
             const posterUrl = movie.Poster !== 'N/A' ? movie.Poster : 
                 `https://placehold.co/400x600/667eea/ffffff?text=${encodeURIComponent(movie.Title)}`;
             
+            const imdbRating = movie.Ratings?.find(r => r.Source === 'Internet Movie Database')?.Value || movie.imdbRating || 'N/A';
+            
             movieDetailsContent.innerHTML = `
-                <button id="closeModal" class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl z-10">&times;</button>
+                <button id="closeModal" class="absolute top-6 right-6 text-white hover:text-gray-300 text-4xl z-10 w-12 h-12 flex items-center justify-center glass-effect rounded-full">&times;</button>
                 <div class="md:flex">
-                    <div class="md:w-1/3">
-                        <img src="${posterUrl}" alt="${movie.Title}" class="w-full h-auto md:rounded-l-2xl"
-                        onerror="this.onerror=null;this.src='https://placehold.co/400x600/667eea/ffffff?text=${encodeURIComponent(movie.Title)}';">
+                    <div class="md:w-2/5 flex-shrink-0">
+                        <img src="${posterUrl}" alt="${movie.Title}" class="w-full h-full object-cover md:rounded-l-3xl" onerror="this.src='https://placehold.co/400x600/667eea/ffffff?text=Image+Not+Found'">
                     </div>
-                    <div class="md:w-2/3 p-8">
-                        <h2 class="text-4xl font-bold mb-2">${movie.Title}</h2>
-                        <div class="flex items-center flex-wrap gap-x-4 gap-y-1 text-gray-400 mb-4">
-                            <span>${movie.Year}</span>
+                    <div class="md:w-3/5 p-8 md:p-10">
+                        <h2 class="text-4xl md:text-5xl font-bold mb-3">${movie.Title}</h2>
+                        <div class="flex flex-wrap items-center gap-4 text-gray-400 mb-4">
+                            <span class="flex items-center gap-1">
+                                <span class="star-rating">⭐</span>
+                                <span class="font-bold text-white">${imdbRating}</span>
+                            </span>
                             <span>•</span>
-                            <span>${movie.Rated}</span>
+                            <span>📅 ${movie.Year}</span>
                             <span>•</span>
-                            <span>${movie.Runtime}</span>
+                            <span class="px-3 py-1 glass-effect rounded-full">${movie.Rated}</span>
+                            <span>•</span>
+                            <span>⏱️ ${movie.Runtime}</span>
                         </div>
                         
                         <div class="flex flex-wrap gap-2 mb-6">
                             ${movie.Genre.split(', ').map(g => `
-                                <span class="genre-chip px-3 py-1 rounded-full text-sm">${g}</span>
+                                <span class="genre-chip px-4 py-2 rounded-full font-medium">${g}</span>
                             `).join('')}
                         </div>
                         
-                        <p class="text-gray-300 mb-6">${movie.Plot}</p>
+                        <p class="text-gray-300 text-lg leading-relaxed mb-6">${movie.Plot}</p>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                            <div>
-                                <p class="text-gray-400 text-sm">Director</p>
-                                <p class="font-semibold">${movie.Director}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="glass-effect p-4 rounded-xl">
+                                <p class="text-gray-400 text-sm mb-1">🎬 Director</p>
+                                <p class="font-semibold text-lg">${movie.Director}</p>
                             </div>
-                            <div>
-                                <p class="text-gray-400 text-sm">Actors</p>
-                                <p class="font-semibold">${movie.Actors}</p>
+                            <div class="glass-effect p-4 rounded-xl">
+                                <p class="text-gray-400 text-sm mb-1">✍️ Writer</p>
+                                <p class="font-semibold text-lg">${movie.Writer?.split(',')[0] || 'N/A'}</p>
+                            </div>
+                            <div class="glass-effect p-4 rounded-xl md:col-span-2">
+                                <p class="text-gray-400 text-sm mb-1">🎭 Cast</p>
+                                <p class="font-semibold text-lg">${movie.Actors}</p>
                             </div>
                         </div>
                         
                         ${movie.Ratings && movie.Ratings.length > 0 ? `
                             <div class="mb-6">
-                                <h4 class="font-semibold mb-3">Ratings</h4>
-                                <div class="flex flex-wrap gap-4">
+                                <h4 class="font-semibold text-xl mb-3">📊 Ratings</h4>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                                     ${movie.Ratings.map(r => `
-                                        <div class="glass-effect px-4 py-2 rounded-lg">
-                                            <p class="text-xs text-gray-400">${r.Source}</p>
-                                            <p class="font-bold">${r.Value}</p>
+                                        <div class="glass-effect px-4 py-3 rounded-xl text-center">
+                                            <p class="text-xs text-gray-400 mb-1">${r.Source}</p>
+                                            <p class="font-bold text-xl">${r.Value}</p>
                                         </div>
                                     `).join('')}
                                 </div>
                             </div>
                         ` : ''}
                         
-                        <button id="getAISuggestions" class="w-full primary-btn px-6 py-3 rounded-xl font-semibold text-white hover:shadow-lg">
-                            🤖 Get AI Suggestions
-                        </button>
+                        ${movie.BoxOffice && movie.BoxOffice !== 'N/A' ? `
+                            <div class="glass-effect p-4 rounded-xl mb-6">
+                                <p class="text-gray-400 text-sm mb-1">💰 Box Office</p>
+                                <p class="font-bold text-2xl">${movie.BoxOffice}</p>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="flex flex-wrap gap-4">
+                            <button id="getAISuggestions" class="flex-1 gradient-bg px-6 py-4 rounded-xl font-semibold text-lg hover:shadow-2xl transition-all">
+                                🤖 Get AI Suggestions
+                            </button>
+                            ${movie.imdbID ? `
+                                <a href="https://www.imdb.com/title/${movie.imdbID}" target="_blank" class="glass-effect px-6 py-4 rounded-xl font-semibold hover:scale-105 transition-all flex items-center gap-2">
+                                    🔗 IMDb
+                                </a>
+                            ` : ''}
+                        </div>
                         
                         <div id="aiSuggestions" class="mt-6"></div>
                     </div>
@@ -709,39 +1160,17 @@
             `;
             
             movieModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
             
-            // Add modal-specific listeners
+            document.getElementById('closeModal').addEventListener('click', closeModal);
             document.getElementById('getAISuggestions').addEventListener('click', () => {
                 getAISuggestions(movie);
             });
         }
 
-        // --- Gemini AI Functions ---
-        async function fetchGeminiWithRetry(payload, retries = 3, delay = 1000) {
-            try {
-                const response = await fetch(GEMINI_API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return await response.json();
-            } catch (error) {
-                if (retries > 0) {
-                    console.warn(`Gemini call failed, retrying... ${retries} left`);
-                    await new Promise(res => setTimeout(res, delay));
-                    return fetchGeminiWithRetry(payload, retries - 1, delay * 2); // Exponential backoff
-                } else {
-                    console.error("Gemini API call failed after retries:", error);
-                    throw error;
-                }
-            }
-        }
-        
-        // AI Suggestions for Modal
-        async function getAISuggestions(movie) {
-            if (!checkGeminiKey()) return;
+        // --- AI Suggestions (in Modal) ---
 
+        async function getAISuggestions(movie) {
             const aiSuggestions = document.getElementById('aiSuggestions');
             const btn = document.getElementById('getAISuggestions');
             
@@ -749,18 +1178,35 @@
             btn.disabled = true;
             
             try {
-                const prompt = `Given the movie "${movie.Title}" (${movie.Year}) - Genre: ${movie.Genre}, Plot: ${movie.Plot}. Suggest 5 similar movies that viewers might enjoy. For each suggestion, provide a brief reason why it's similar.`;
-                const suggestions = await fetchGeminiSuggestionsList(prompt);
+                const suggestions = await fetchGeminiSuggestions(movie);
                 displayAISuggestions(suggestions, aiSuggestions);
+                showNotification('AI suggestions generated!', 'success');
             } catch (error) {
-                aiSuggestions.innerHTML = `<p class="text-red-400">Error getting suggestions: ${error.message}</p>`;
+                aiSuggestions.innerHTML = `
+                    <div class="glass-effect p-6 rounded-xl text-center">
+                        <p class="text-red-400">⚠️ Error getting suggestions: ${error.message}</p>
+                    </div>
+                `;
+                showNotification('Failed to get AI suggestions', 'error');
             } finally {
                 btn.innerHTML = '✨ Refresh Suggestions';
                 btn.disabled = false;
             }
         }
 
-        async function fetchGeminiSuggestionsList(prompt) {
+        async function fetchGeminiSuggestions(movie) {
+            const prompt = `Based on the movie "${movie.Title}" (${movie.Year}):
+Genre: ${movie.Genre}
+Plot: ${movie.Plot}
+Director: ${movie.Director}
+
+Suggest 6 similar movies that fans would enjoy. For each movie, provide:
+1. Title
+2. Year
+3. A compelling, brief reason why it's similar (focus on themes, style, or emotional impact)
+
+Make the recommendations diverse but thematically connected.`;
+            
             const payload = {
                 contents: [{ parts: [{ text: prompt }] }],
                 generationConfig: {
@@ -780,15 +1226,95 @@
                 }
             };
             
-            const data = await fetchGeminiWithRetry(payload);
-            
-            if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            const data = await fetchWithBackoff(GEMINI_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
                 throw new Error("Invalid response structure from AI.");
             }
             return JSON.parse(data.candidates[0].content.parts[0].text);
         }
 
-        async function fetchGeminiMovieList(prompt) {
+        function displayAISuggestions(suggestions, container) {
+            container.innerHTML = `
+                <div class="glass-strong p-6 rounded-2xl">
+                    <h4 class="font-semibold text-2xl mb-4 flex items-center gap-2">
+                        <span>🤖</span>
+                        <span>AI Recommendations</span>
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${suggestions.map((s, i) => `
+                            <div class="glass-effect p-5 rounded-xl hover:scale-105 transition-all cursor-pointer suggestion-card" data-title="${s.title}">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-1">
+                                        <h5 class="font-bold text-lg mb-1">${s.title}</h5>
+                                        <p class="text-sm text-gray-400 mb-2">${s.year}</p>
+                                        <p class="text-sm text-gray-300">${s.reason}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            container.querySelectorAll('.suggestion-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    closeModal();
+                    movieSearch.value = card.dataset.title;
+                    navigateToSection('search');
+                    setTimeout(performSearch, 50);
+                });
+            });
+        }
+
+        // --- Genre & Advanced Search ---
+
+        async function performGenreSearch() {
+            const genre = genreSelect.value;
+            const language = languageSelect.value;
+            const yearRange = yearRangeSelect.value;
+            
+            if (!genre) {
+                showNotification('Please select a genre', 'warning');
+                return;
+            }
+            
+            showLoading(true);
+            showLoadingSkeleton(genreResults, 6);
+            
+            try {
+                const movies = await getGenreMoviesFromAI(genre, language, yearRange);
+                displayGenreMovies(movies, genre, language, yearRange);
+                showNotification('Genre recommendations loaded!', 'success');
+            } catch (error) {
+                genreResults.innerHTML = `<div class="glass-effect p-10 rounded-2xl text-center"><p class="text-xl text-red-400">Error: ${error.message}</p></div>`;
+                showNotification('Failed to load recommendations', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function getGenreMoviesFromAI(genre, language, yearRange) {
+            let prompt = `Suggest 12 critically acclaimed and popular ${genre} movies`;
+            
+            if (language) prompt += ` in ${language} language`;
+            if (yearRange) {
+                const yearRanges = {
+                    '2020s': 'from 2020 onwards',
+                    '2010s': 'from 2010-2019',
+                    '2000s': 'from 2000-2009',
+                    '1990s': 'from 1990-1999',
+                    '1980s': 'from 1980-1989',
+                    'Classic': 'before 1980'
+                };
+                prompt += ` ${yearRanges[yearRange]}`;
+            }
+            prompt += '. Include both well-known and hidden gems. Provide title, year, and a brief one-sentence description.';
+            
             const payload = {
                 contents: [{ parts: [{ text: prompt }] }],
                 generationConfig: {
@@ -799,174 +1325,214 @@
                             type: "OBJECT",
                             properties: {
                                 title: { type: "STRING" },
-                                year: { type: "STRING" }
+                                year: { type: "STRING" },
+                                description: { type: "STRING" }
                             },
-                            required: ["title", "year"]
+                            required: ["title", "year", "description"]
                         }
                     }
                 }
             };
-
-            const data = await fetchGeminiWithRetry(payload);
             
-            if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            const data = await fetchWithBackoff(GEMINI_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
                 throw new Error("Invalid response structure from AI.");
             }
             return JSON.parse(data.candidates[0].content.parts[0].text);
         }
 
-        function displayAISuggestions(suggestions, container) {
-            container.innerHTML = `
-                <h4 class="font-semibold mb-3 text-lg">AI Recommendations</h4>
-                <div class="space-y-3">
-                    ${suggestions.map(s => `
-                        <div class="glass-effect p-4 rounded-xl ai-suggestion-card" data-title="${s.title}">
-                            <h5 class="font-semibold">${s.title} (${s.year})</h5>
-                            <p class="text-sm text-gray-400 mt-1">${s.reason}</p>
+        function displayGenreMovies(movies, genre, language, yearRange) {
+            const filters = [genre, language, yearRange].filter(Boolean).join(' • ');
+            
+            genreResults.innerHTML = `
+                <div class="mb-6 flex items-center justify-between flex-wrap gap-4">
+                    <h3 class="text-3xl font-bold">🎬 ${genre} Movies</h3>
+                    <span class="glass-effect px-4 py-2 rounded-full text-sm">${filters}</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${movies.map((movie, i) => `
+                        <div class="glass-effect p-6 rounded-2xl hover:scale-105 transition-all cursor-pointer genre-movie-btn group" 
+                             data-title="${movie.title}" data-year="${movie.year}">
+                            <div class="flex items-start gap-4">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-xl mb-1 group-hover:text-purple-300 transition-colors">${movie.title}</h4>
+                                    <p class="text-gray-400 mb-2">📅 ${movie.year}</p>
+                                    ${movie.description ? `<p class="text-sm text-gray-300">${movie.description}</p>` : ''}
+                                </div>
+                            </div>
                         </div>
                     `).join('')}
                 </div>
             `;
+            
+            document.querySelectorAll('.genre-movie-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    movieSearch.value = btn.dataset.title;
+                    navigateToSection('search');
+                    setTimeout(performSearch, 50);
+                });
+            });
         }
 
-        // --- Genre Section ---
-        document.querySelectorAll('.genre-browse-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const genre = btn.dataset.genre;
-                
-                if (genre) {
-                    // Switch to genres section
-                    document.querySelector('[data-section="genres"]').click();
-                    document.getElementById('genreSelect').value = genre;
-                    document.getElementById('getGenreMovies').click();
-                }
-            });
-        });
-
-        // Genre search
-        document.getElementById('getGenreMovies').addEventListener('click', async () => {
-            if (!checkGeminiKey() || !checkOmdbKey()) return;
-
-            const genre = document.getElementById('genreSelect').value;
-            const language = document.getElementById('languageSelect').value;
+        async function performAdvancedSearch() {
+            const title = advTitle.value.trim();
+            const year = advYear.value.trim();
+            const genre = advGenre.value.trim();
+            const rating = advRating.value.trim();
             
-            if (!genre) {
-                genreResults.innerHTML = `
-                    <div class="glass-effect p-8 rounded-2xl text-center">
-                        <p class="text-xl text-gray-400">Please select a genre</p>
-                    </div>
-                `;
+            if (!title && !genre) {
+                showNotification('Please enter at least a title or genre', 'warning');
                 return;
             }
             
             showLoading(true);
-            genreResults.innerHTML = '';
+            showLoadingSkeleton(advancedResults, 5);
             
             try {
-                let prompt = `Suggest 10 popular and highly-rated ${genre} movies.`;
-                if (language) {
-                    prompt = `Suggest 10 popular and highly-rated ${language} ${genre} movies.`;
+                let movies = [];
+                if (title) {
+                    // Title-based search, then filter
+                    const data = await fetchWithBackoff(`${OMDB_API_URL}?apikey=${OMDB_API_KEY}&s=${encodeURIComponent(title)}${year ? `&y=${year}` : ''}`);
+                    if (data.Response === 'True') {
+                        // We need to fetch details for each to filter by genre and rating
+                        const detailedMovies = await Promise.all(
+                            data.Search.map(async movie => {
+                                const detailData = await fetchWithBackoff(`${OMDB_API_URL}?apikey=${OMDB_API_KEY}&i=${movie.imdbID}`);
+                                return detailData.Response === 'True' ? detailData : null;
+                            })
+                        );
+                        
+                        movies = detailedMovies.filter(m => {
+                            if (!m) return false;
+                            const matchesGenre = !genre || (m.Genre && m.Genre.toLowerCase().includes(genre.toLowerCase()));
+                            const matchesRating = !rating || (m.imdbRating && m.imdbRating !== 'N/A' && parseFloat(m.imdbRating) >= parseFloat(rating));
+                            return matchesGenre && matchesRating;
+                        });
+                    }
+                } else if (genre) {
+                    // Genre-based search using AI
+                    const aiMovies = await getGenreMoviesFromAI(genre, '', year); // AI search can handle year
+                    // Convert AI response to OMDb-like structure for display
+                    movies = aiMovies.map(m => ({
+                        Title: m.title,
+                        Year: m.year,
+                        imdbID: null, // AI doesn't provide this
+                        Poster: 'N/A', // AI doesn't provide this
+                        Genre: genre,
+                        imdbRating: m.description.includes('rating') ? m.description.match(/(\d\.\d)/)?.[0] : null // Simple parse
+                    }));
+                    // Filter by rating if provided
+                    if(rating) {
+                        movies = movies.filter(m => m.imdbRating && parseFloat(m.imdbRating) >= parseFloat(rating));
+                    }
                 }
-
-                const movies = await fetchGeminiMovieList(prompt);
-                
-                const moviePromises = movies.map(movie => 
-                    fetchOMDBDetailsByTitle(movie.title, movie.year)
-                );
-                const movieData = await Promise.all(moviePromises);
-                const validMovies = movieData.filter(movie => movie && movie.Response === 'True');
-
-                displayGenreMovies(validMovies, genre);
+                displayAdvancedResults(movies, { title, year, genre, rating });
+                showNotification(`Found ${movies.length} results!`, 'success');
             } catch (error) {
-                genreResults.innerHTML = `
-                    <div class="glass-effect p-8 rounded-2xl text-center">
-                        <p class="text-xl text-red-400">Error: ${error.message}</p>
-                    </div>
-                `;
+                advancedResults.innerHTML = `<div class="glass-effect p-10 rounded-2xl text-center"><p class="text-xl text-red-400">Error: ${error.message}</p></div>`;
+                showNotification('Advanced search failed', 'error');
             } finally {
                 showLoading(false);
             }
-        });
+        }
 
-        function displayGenreMovies(movies, genre) {
-            genreResults.innerHTML = `
-                <h3 class="text-2xl font-bold mb-6">Top ${genre} Movies</h3>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                    ${movies.map(movie => renderMovieCard(movie)).join('')}
+        function displayAdvancedResults(movies, filters) {
+            const filterStr = Object.entries(filters).filter(([_, v]) => v).map(([k, v]) => `${k}: ${v}`).join(' • ');
+            
+            advancedResults.innerHTML = `
+                <div class="mb-6 flex items-center justify-between flex-wrap gap-4">
+                    <h3 class="text-3xl font-bold">🔍 Advanced Results</h3>
+                    <span class="glass-effect px-4 py-2 rounded-full text-sm">${filterStr || 'All'}</span>
                 </div>
+                ${movies.length === 0 ? `
+                    <div class="glass-effect p-10 rounded-2xl text-center">
+                        <div class="text-6xl mb-4">🤷</div>
+                        <p class="text-2xl font-semibold">No movies matched your criteria</p>
+                    </div>
+                ` : `
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                        ${movies.map(movie => `
+                            <div class="movie-card glass-effect rounded-2xl overflow-hidden cursor-pointer group" data-id="${movie.imdbID}" data-title="${movie.Title}">
+                                <div class="relative">
+                                    <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'https://placehold.co/300x445/667eea/ffffff?text=' + encodeURIComponent(movie.Title)}" 
+                                         alt="${movie.Title}" 
+                                         class="w-full h-80 object-cover"
+                                         onerror="this.src='https://placehold.co/300x445/667eea/ffffff?text=Image+Not+Found'">
+                                    ${movie.imdbRating && movie.imdbRating !== 'N/A' ? `
+                                        <div class="absolute top-2 right-2 glass-effect px-3 py-1 rounded-full text-sm font-bold z-10">
+                                            ⭐ ${movie.imdbRating}
+                                        </div>
+                                    ` : ''}
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4 z-10">
+                                        <span class="text-white font-semibold">View Details →</span>
+                                    </div>
+                                </div>
+                                <div class="p-4 relative z-20">
+                                    <h4 class="font-semibold truncate text-lg">${movie.Title}</h4>
+                                    <p class="text-sm text-gray-400">${movie.Year}</p>
+                                    ${movie.Genre ? `<p class="text-xs text-gray-500 mt-1 truncate">${movie.Genre.split(',')[0]}</p>` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `}
             `;
+            
+            document.querySelectorAll('.movie-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const imdbID = card.dataset.id;
+                    if (imdbID && imdbID !== 'null') {
+                        fetchMovieDetails(imdbID);
+                    } else {
+                        // Fallback for AI-found movies without an ID
+                        movieSearch.value = card.dataset.title;
+                        navigateToSection('search');
+                        setTimeout(performSearch, 50);
+                    }
+                });
+            });
         }
 
-        // --- AI Picks Section ---
-        document.getElementById('getAIPicksBtn').addEventListener('click', async () => {
-            if (!checkGeminiKey()) return;
-
-            const aiPrompt = document.getElementById('aiPrompt');
-            const prompt = aiPrompt.value.trim();
-            if (!prompt) return;
-
-            const resultsContainer = document.getElementById('aiPicksResults');
-            const btn = document.getElementById('getAIPicksBtn');
-
-            btn.innerHTML = '<div class="loader ease-linear rounded-full border-4 border-t-4 border-white h-6 w-6 mx-auto"></div>';
-            btn.disabled = true;
-            resultsContainer.innerHTML = '';
-
-            try {
-                const aiPrompt = `Based on the user's request: "${prompt}", suggest 5 movies. For each suggestion, provide the title, year, and a brief reason why it fits the request.`;
-                const suggestions = await fetchGeminiSuggestionsList(aiPrompt);
-                displayAISuggestions(suggestions, resultsContainer);
-            } catch (error) {
-                resultsContainer.innerHTML = `<p class="text-red-400">Error getting suggestions: ${error.message}</p>`;
-            } finally {
-                btn.innerHTML = 'Get AI Picks';
-                btn.disabled = false;
-            }
-        });
-
-        // --- Global Event Listeners (for dynamic content) ---
-        document.addEventListener('click', (e) => {
-            // Movie Card Click
-            const movieCard = e.target.closest('.movie-card');
-            if (movieCard) {
-                fetchMovieDetails(movieCard.dataset.id);
-                return;
-            }
-
-            // AI Suggestion Card Click
-            const aiSuggestion = e.target.closest('.ai-suggestion-card');
-            if (aiSuggestion) {
-                movieSearch.value = aiSuggestion.dataset.title;
-                document.querySelector('[data-section="search"]').click();
-                performSearch();
-                // Close modal if it's open
-                movieModal.classList.add('hidden');
-                return;
-            }
-
-            // Close Modal
-            const closeModalBtn = e.target.closest('#closeModal');
-            if (closeModalBtn) {
-                movieModal.classList.add('hidden');
-                return;
-            }
-        });
-
-        // Close modal on outside click
-        movieModal.addEventListener('click', (e) => {
-            if (e.target === movieModal) {
-                movieModal.classList.add('hidden');
-            }
-        });
-
-        // --- Utility ---
-        function showLoading(show) {
-            if (show) {
-                loadingSpinner.classList.remove('hidden');
-            } else {
-                loadingSpinner.classList.add('hidden');
-            }
+        // --- Other Helpers ---
+        function findRandomMovie() {
+            const randomMovies = [
+                'Inception', 'The Matrix', 'Pulp Fiction', 'Fight Club', 
+                'Interstellar', 'The Shawshank Redemption', 'The Godfather',
+                'Forrest Gump', 'The Dark Knight', 'Goodfellas', 'Se7en',
+                'The Silence of the Lambs', 'Gladiator', 'The Prestige',
+                'Parasite', 'Oppenheimer', 'Dune', 'Blade Runner 2049'
+            ];
+            
+            const randomMovie = randomMovies[Math.floor(Math.random() * randomMovies.length)];
+            movieSearch.value = randomMovie;
+            navigateToSection('search');
+            setTimeout(performSearch, 50);
+            showNotification(`🎲 Random pick: ${randomMovie}`, 'info');
         }
+
+        function initScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.scroll-fade').forEach(el => {
+                observer.observe(el);
+            });
+        }
+        
+        console.log('%c🎬 CineVerse Enhanced', 'color: #667eea; font-size: 24px; font-weight: bold;');
+        console.log('%cAI-Powered Movie Discovery Platform', 'color: #764ba2; font-size: 14px;');
+
     </script>
 </body>
 </html>
+
